@@ -75,16 +75,7 @@ public final class JSONObject extends LinkedHashMap<String, JSONElement> impleme
   }
 
   @Override
-  public String toJSON() {
-    return toJSON(false);
-  }
-
-  @Override
-  public String toJSONCompact() {
-    return toJSON(true);
-  }
-
-  private String toJSON(boolean compact) {
+  public String toJSON(boolean compact) {
     if (isEmpty()) {
       return "{}";
     }
@@ -102,7 +93,7 @@ public final class JSONObject extends LinkedHashMap<String, JSONElement> impleme
       if (value == this) {
         builder.append("(this object)");
       } else {
-        builder.append(compact ? value.toJSONCompact() : value.toJSON());
+        builder.append(value.toJSON(compact));
       }
       if (!iterator.hasNext()) {
         return builder.append('}').toString();

@@ -90,16 +90,7 @@ public final class JSONArray extends ArrayList<JSONElement> implements JSONEleme
   }
 
   @Override
-  public String toJSON() {
-    return toJSON(false);
-  }
-
-  @Override
-  public String toJSONCompact() {
-    return toJSON(true);
-  }
-
-  private String toJSON(boolean compact) {
+  public String toJSON(boolean compact) {
     if (isEmpty()) {
       return "[]";
     }
@@ -108,7 +99,7 @@ public final class JSONArray extends ArrayList<JSONElement> implements JSONEleme
     builder.append('[');
     for (;;) {
       JSONElement item = iterator.next();
-      builder.append(item == this ? "(this array)" : item);
+      builder.append((item == this) ? "(this array)" : item.toJSON(compact));
       if (!iterator.hasNext()) {
         return builder.append(']').toString();
       }

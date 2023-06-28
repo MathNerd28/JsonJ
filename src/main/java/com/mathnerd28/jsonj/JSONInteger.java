@@ -24,8 +24,8 @@ public final class JSONInteger implements JSONElement, LongSupplier, IntSupplier
   }
 
   @Override
-  public String toJSON() {
-    return toString();
+  public String toJSON(boolean compact) {
+    return Long.toString(value);
   }
 
   @Override

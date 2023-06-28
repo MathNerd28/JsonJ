@@ -18,8 +18,8 @@ public final class JSONFloat implements JSONElement, DoubleSupplier {
   }
 
   @Override
-  public String toJSON() {
-    return toString();
+  public String toJSON(boolean compact) {
+    return Double.toString(value);
   }
 
   @Override

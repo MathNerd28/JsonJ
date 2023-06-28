@@ -36,7 +36,7 @@ public final class JSONString implements JSONElement, Supplier<String> {
   }
 
   @Override
-  public String toJSON() {
+  public String toJSON(boolean compact) {
     StringBuilder builder = new StringBuilder(str.length() + 2);
     builder.append('"');
     for (char c : str.toCharArray()) {

@@ -12,7 +12,7 @@ public interface JSONElement extends Serializable {
     }
 
     @Override
-    public String toJSON() {
+    public String toJSON(boolean compact) {
       return "null";
     }
 
@@ -22,9 +22,9 @@ public interface JSONElement extends Serializable {
     }
   };
 
-  String toJSON();
+  String toJSON(boolean compact);
 
-  default String toJSONCompact() {
-    return toJSON();
+  default String toJSON() {
+    return toJSON(false);
   }
 }

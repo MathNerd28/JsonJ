@@ -20,8 +20,8 @@ public final class JSONBoolean implements JSONElement, BooleanSupplier {
   }
 
   @Override
-  public String toJSON() {
-    return toString();
+  public String toJSON(boolean compact) {
+    return Boolean.toString(value);
   }
 
   @Override
