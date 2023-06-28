@@ -32,7 +32,7 @@ public class JSONParser {
     return this;
   }
 
-  public JSONBase parse(String json) throws JSONParseException {
+  public JSONElement parse(String json) throws JSONParseException {
     try {
       return parse(new StringReader(json));
     } catch (IOException e) {
@@ -41,15 +41,15 @@ public class JSONParser {
     }
   }
 
-  public JSONBase parse(File file) throws IOException, JSONParseException {
+  public JSONElement parse(File file) throws IOException, JSONParseException {
     return parse(new FileReader(file));
   }
 
-  public JSONBase parse(InputStream stream) throws IOException, JSONParseException {
+  public JSONElement parse(InputStream stream) throws IOException, JSONParseException {
     return parse(new InputStreamReader(stream, StandardCharsets.UTF_8));
   }
 
-  public JSONBase parse(Reader reader) throws IOException, JSONParseException {
+  public JSONElement parse(Reader reader) throws IOException, JSONParseException {
     if (reader == null) {
       throw new IllegalArgumentException("reader cannot be null");
     }
@@ -74,13 +74,15 @@ public class JSONParser {
 
     while (noRead || (c = reader.read()) != -1) {
       noRead = false;
-      if (c == 0x0009 || c == 0x000a || c == 0x000d || c == 0x0020) {
-        // whitespace
-        continue;
-      }
 
       // These don't require the buffer, fastpath
       switch (c) {
+        case ' ':
+        case '\n':
+        case '\t':
+        case '\r':
+          // whitespace
+          continue;
         case ',':
           tokens.add(Token.COMMA);
           continue;
@@ -101,7 +103,10 @@ public class JSONParser {
           continue;
         case 't':
           if (
-            (c = reader.read()) == 'r' && (c = reader.read()) == 'u' && (c = reader.read()) == 'e'
+            // prettier-ignore
+            (c = reader.read()) == 'r' &&
+            (c = reader.read()) == 'u' &&
+            (c = reader.read()) == 'e'
           ) {
             tokens.add(Token.TRUE);
           } else if (c == -1) {
@@ -112,6 +117,7 @@ public class JSONParser {
           continue;
         case 'f':
           if (
+            // prettier-ignore
             (c = reader.read()) == 'a' &&
             (c = reader.read()) == 'l' &&
             (c = reader.read()) == 's' &&
@@ -126,7 +132,10 @@ public class JSONParser {
           continue;
         case 'n':
           if (
-            (c = reader.read()) == 'u' && (c = reader.read()) == 'l' && (c = reader.read()) == 'l'
+            // prettier-ignore
+            (c = reader.read()) == 'u' &&
+            (c = reader.read()) == 'l' &&
+            (c = reader.read()) == 'l'
           ) {
             tokens.add(Token.NULL);
           } else if (c == -1) {
@@ -145,7 +154,7 @@ public class JSONParser {
       if (c == '"') {
         // String
         boolean escaped = false;
-        loop:while ((c = reader.read()) != '"' || escaped) {
+        loop:for (;;) {
           if (c == -1) {
             throwEOF();
           } else if (c < 0x0020) {
@@ -233,12 +242,14 @@ public class JSONParser {
           }
         }
         tokens.add(new Token(Token.Type.STRING, builder.toString()));
-      } else if ((c >= '0' && c <= '9') || c == 0x002d) {
+      } else if ((c >= '0' && c <= '9') || c == '-') {
         // Number: grab all characters, then verify
         do {
           builder.append((char) c);
+          c = reader.read();
         } while (
-          ((c = reader.read()) >= '0' && c <= '9') ||
+          // prettier-ignore
+          (c >= '0' && c <= '9') ||
           c == '.' ||
           c == 'e' ||
           c == 'E' ||
@@ -307,7 +318,7 @@ public class JSONParser {
           throwIfExists(obj, key, JSONBoolean.FALSE);
           break;
         case NULL:
-          throwIfExists(obj, key, JSONBase.NULL);
+          throwIfExists(obj, key, JSONElement.NULL);
           break;
         case LEFT_BRACKET:
           throwIfExists(obj, key, processArr(tokens));
@@ -329,7 +340,7 @@ public class JSONParser {
     return null;
   }
 
-  private void throwIfExists(JSONObject obj, String key, JSONBase value) throws JSONParseException {
+  private void throwIfExists(JSONObject obj, String key, JSONElement value) throws JSONParseException {
     if (obj.put(key, value) != null && !overwriteDuplicateKeys) {
       throw new JSONParseException("Duplicate key '" + key + "'");
     }
@@ -368,7 +379,7 @@ public class JSONParser {
           array.add(JSONBoolean.FALSE);
           break;
         case NULL:
-          array.add(JSONBase.NULL);
+          array.add(JSONElement.NULL);
           break;
         case LEFT_BRACKET:
           array.add(processArr(tokens));

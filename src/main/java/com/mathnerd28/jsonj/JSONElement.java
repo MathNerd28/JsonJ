@@ -2,8 +2,8 @@ package com.mathnerd28.jsonj;
 
 import java.io.Serializable;
 
-public interface JSONBase extends Serializable {
-  JSONBase NULL = new JSONBase() {
+public interface JSONElement extends Serializable {
+  JSONElement NULL = new JSONElement() {
     private static final long serialVersionUID = -4256104788023041722L;
 
     @Override
@@ -25,10 +25,6 @@ public interface JSONBase extends Serializable {
   String toJSON();
 
   default String toJSONCompact() {
-    return toJSON();
-  }
-
-  default String toJSONFormatted() {
     return toJSON();
   }
 }

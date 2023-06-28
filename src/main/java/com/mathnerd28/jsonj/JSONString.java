@@ -3,7 +3,7 @@ package com.mathnerd28.jsonj;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public final class JSONString implements JSONBase, Supplier<String> {
+public final class JSONString implements JSONElement, Supplier<String> {
 
   private static final long serialVersionUID = 7777030346963177423L;
 

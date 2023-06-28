@@ -3,7 +3,7 @@ package com.mathnerd28.jsonj;
 import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 
-public final class JSONInteger implements JSONBase, LongSupplier, IntSupplier {
+public final class JSONInteger implements JSONElement, LongSupplier, IntSupplier {
 
   private static final long serialVersionUID = 3836778627312723823L;
 

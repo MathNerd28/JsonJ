@@ -2,7 +2,7 @@ package com.mathnerd28.jsonj;
 
 import java.util.function.BooleanSupplier;
 
-public final class JSONBoolean implements JSONBase, BooleanSupplier {
+public final class JSONBoolean implements JSONElement, BooleanSupplier {
 
   private static final long serialVersionUID = -8286974874362307637L;
 

@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public final class JSONObject extends LinkedHashMap<String, JSONBase> implements JSONBase {
+public final class JSONObject extends LinkedHashMap<String, JSONElement> implements JSONElement {
 
   private static final long serialVersionUID = -7400546217746697748L;
 
@@ -17,7 +17,7 @@ public final class JSONObject extends LinkedHashMap<String, JSONBase> implements
     super(capacity);
   }
 
-  public JSONObject(Map<String, JSONBase> map) {
+  public JSONObject(Map<String, JSONElement> map) {
     super(map);
   }
 
@@ -46,7 +46,7 @@ public final class JSONObject extends LinkedHashMap<String, JSONBase> implements
   }
 
   public double getDouble(String key) {
-    JSONBase val = get(key);
+    JSONElement val = get(key);
     if (val instanceof JSONFloat) {
       return ((JSONFloat) val).getAsDouble();
     } else {
@@ -54,23 +54,23 @@ public final class JSONObject extends LinkedHashMap<String, JSONBase> implements
     }
   }
 
-  public JSONBase putString(String key, String value) {
+  public JSONElement putString(String key, String value) {
     return put(key, new JSONString(value));
   }
 
-  public JSONBase putBoolean(String key, boolean value) {
+  public JSONElement putBoolean(String key, boolean value) {
     return put(key, JSONBoolean.valueOf(value));
   }
 
-  public JSONBase putLong(String key, long value) {
+  public JSONElement putLong(String key, long value) {
     return put(key, new JSONInteger(value));
   }
 
-  public JSONBase putInteger(String key, int value) {
+  public JSONElement putInteger(String key, int value) {
     return put(key, new JSONInteger(value));
   }
 
-  public JSONBase putDouble(String key, double value) {
+  public JSONElement putDouble(String key, double value) {
     return put(key, new JSONFloat(value));
   }
 
@@ -88,13 +88,13 @@ public final class JSONObject extends LinkedHashMap<String, JSONBase> implements
     if (isEmpty()) {
       return "{}";
     }
-    Iterator<Entry<String, JSONBase>> iterator = entrySet().iterator();
+    Iterator<Entry<String, JSONElement>> iterator = entrySet().iterator();
     StringBuilder builder = new StringBuilder();
     builder.append('{');
     for (;;) {
-      Entry<String, JSONBase> entry = iterator.next();
+      Entry<String, JSONElement> entry = iterator.next();
       String key = entry.getKey();
-      JSONBase value = entry.getValue();
+      JSONElement value = entry.getValue();
       builder.append(new JSONString(key).toJSON()).append(':');
       if (!compact) {
         builder.append(' ');
@@ -114,7 +114,6 @@ public final class JSONObject extends LinkedHashMap<String, JSONBase> implements
     }
   }
 
-  @Override
   public String toJSONFormatted() {
     return toJSONFormatted("  ");
   }
@@ -123,13 +122,13 @@ public final class JSONObject extends LinkedHashMap<String, JSONBase> implements
     if (isEmpty()) {
       return "{}";
     }
-    Iterator<Entry<String, JSONBase>> iterator = entrySet().iterator();
+    Iterator<Entry<String, JSONElement>> iterator = entrySet().iterator();
     StringBuilder builder = new StringBuilder();
     builder.append("{\n");
     for (;;) {
-      Entry<String, JSONBase> entry = iterator.next();
+      Entry<String, JSONElement> entry = iterator.next();
       String key = entry.getKey();
-      JSONBase value = entry.getValue();
+      JSONElement value = entry.getValue();
       builder.append(indentation).append(new JSONString(key).toJSON()).append(": ");
       if (value == this) {
         builder.append("(this object)");

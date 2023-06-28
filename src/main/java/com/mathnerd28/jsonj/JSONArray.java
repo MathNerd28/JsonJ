@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
+public final class JSONArray extends ArrayList<JSONElement> implements JSONElement {
 
   private static final long serialVersionUID = 1637774693420351464L;
 
@@ -12,7 +12,7 @@ public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
     super();
   }
 
-  public JSONArray(Collection<JSONBase> c) {
+  public JSONArray(Collection<JSONElement> c) {
     super(c);
   }
 
@@ -41,7 +41,7 @@ public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
   }
 
   public double getDouble(int index) {
-    JSONBase val = get(index);
+    JSONElement val = get(index);
     if (val instanceof JSONFloat) {
       return ((JSONFloat) val).getAsDouble();
     } else {
@@ -103,11 +103,11 @@ public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
     if (isEmpty()) {
       return "[]";
     }
-    Iterator<JSONBase> iterator = iterator();
+    Iterator<JSONElement> iterator = iterator();
     StringBuilder builder = new StringBuilder();
     builder.append('[');
     for (;;) {
-      JSONBase item = iterator.next();
+      JSONElement item = iterator.next();
       builder.append(item == this ? "(this array)" : item);
       if (!iterator.hasNext()) {
         return builder.append(']').toString();
@@ -119,7 +119,6 @@ public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
     }
   }
 
-  @Override
   public String toJSONFormatted() {
     return toJSONFormatted("  ");
   }
@@ -128,12 +127,12 @@ public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
     if (isEmpty()) {
       return "[]";
     }
-    Iterator<JSONBase> iterator = iterator();
+    Iterator<JSONElement> iterator = iterator();
     StringBuilder builder = new StringBuilder();
     builder.append("[\n");
     for (;;) {
       builder.append(indentation);
-      JSONBase item = iterator.next();
+      JSONElement item = iterator.next();
       if (item == this) {
         builder.append("(this array)");
       } else if (item instanceof JSONObject) {
