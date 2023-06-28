@@ -119,14 +119,13 @@ public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
 
   @Override
   public String toJSONFormatted() {
-    return toJSONFormatted(2);
+    return toJSONFormatted("  ");
   }
 
-  String toJSONFormatted(int indent) {
+  String toJSONFormatted(String indentation) {
     if (isEmpty()) {
       return "[]";
     }
-    String indentation = " ".repeat(indent);
     Iterator<JSONBase> iterator = iterator();
     StringBuilder builder = new StringBuilder();
     builder.append("[\n");
@@ -136,16 +135,16 @@ public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
       if (item == this) {
         builder.append("(this array)");
       } else if (item instanceof JSONObject) {
-        builder.append(((JSONObject) item).toJSONFormatted(indent + 2));
+        builder.append(((JSONObject) item).toJSONFormatted(indentation + "  "));
       } else if (item instanceof JSONArray) {
-        builder.append(((JSONArray) item).toJSONFormatted(indent + 2));
+        builder.append(((JSONArray) item).toJSONFormatted(indentation + "  "));
       } else {
         builder.append(item.toJSON());
       }
       if (!iterator.hasNext()) {
         builder.append('\n');
-        if (indent > 2) {
-          builder.append(" ".repeat(indent - 2));
+        if (indentation.length() > 2) {
+          builder.append(indentation.substring(0, indentation.length() - 2));
         }
         return builder.append(']')
                       .toString();

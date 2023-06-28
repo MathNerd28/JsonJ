@@ -115,14 +115,13 @@ public final class JSONObject extends LinkedHashMap<String, JSONBase> implements
 
   @Override
   public String toJSONFormatted() {
-    return toJSONFormatted(2);
+    return toJSONFormatted("  ");
   }
 
-  String toJSONFormatted(int indent) {
+  String toJSONFormatted(String indentation) {
     if (isEmpty()) {
       return "{}";
     }
-    String indentation = " ".repeat(indent);
     Iterator<Entry<String, JSONBase>> iterator = entrySet().iterator();
     StringBuilder builder = new StringBuilder();
     builder.append("{\n");
@@ -136,16 +135,16 @@ public final class JSONObject extends LinkedHashMap<String, JSONBase> implements
       if (value == this) {
         builder.append("(this object)");
       } else if (value instanceof JSONObject) {
-        builder.append(((JSONObject) value).toJSONFormatted(indent + 2));
+        builder.append(((JSONObject) value).toJSONFormatted(indentation + "  "));
       } else if (value instanceof JSONArray) {
-        builder.append(((JSONArray) value).toJSONFormatted(indent + 2));
+        builder.append(((JSONArray) value).toJSONFormatted(indentation + "  "));
       } else {
         builder.append(value.toJSON());
       }
       if (!iterator.hasNext()) {
         builder.append('\n');
-        if (indent > 2) {
-          builder.append(" ".repeat(indent - 2));
+        if (indentation.length() > 2) {
+          builder.append(indentation.substring(0, indentation.length() - 2));
         }
         return builder.append('}')
                       .toString();
