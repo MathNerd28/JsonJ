@@ -1,7 +1,11 @@
 package com.mathnerd28.jsonj;
 
-public interface JSONBase {
+import java.io.Serializable;
+
+public interface JSONBase extends Serializable {
   JSONBase NULL = new JSONBase() {
+    private static final long serialVersionUID = -4256104788023041722L;
+
     @Override
     public String toString() {
       return "NULL";

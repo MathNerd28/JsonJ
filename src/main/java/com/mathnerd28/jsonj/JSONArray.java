@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Iterator;
 
 public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
+  private static final long serialVersionUID = 1637774693420351464L;
+
   public JSONArray() {
     super();
   }

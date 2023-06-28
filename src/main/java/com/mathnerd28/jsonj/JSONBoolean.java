@@ -3,6 +3,8 @@ package com.mathnerd28.jsonj;
 import java.util.function.BooleanSupplier;
 
 public final class JSONBoolean implements JSONBase, BooleanSupplier {
+  private static final long serialVersionUID = -8286974874362307637L;
+  
   public static final JSONBoolean TRUE  = new JSONBoolean(true);
   public static final JSONBoolean FALSE = new JSONBoolean(false);
 

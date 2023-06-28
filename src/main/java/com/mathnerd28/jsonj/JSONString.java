@@ -4,6 +4,8 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public final class JSONString implements JSONBase, Supplier<String> {
+  private static final long serialVersionUID = 7777030346963177423L;
+  
   private final String str;
 
   public JSONString(String str) {

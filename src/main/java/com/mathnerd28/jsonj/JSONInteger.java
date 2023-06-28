@@ -4,6 +4,8 @@ import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 
 public final class JSONInteger implements JSONBase, LongSupplier, IntSupplier {
+  private static final long serialVersionUID = 3836778627312723823L;
+  
   private final long value;
 
   public JSONInteger(long value) {

@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public final class JSONObject extends LinkedHashMap<String, JSONBase> implements JSONBase {
+  private static final long serialVersionUID = -7400546217746697748L;
+
   public JSONObject() {
     super();
   }

@@ -3,6 +3,8 @@ package com.mathnerd28.jsonj;
 import java.util.function.DoubleSupplier;
 
 public final class JSONFloat implements JSONBase, DoubleSupplier {
+  private static final long serialVersionUID = -1001481974395547082L;
+  
   private final double value;
 
   public JSONFloat(double value) {
