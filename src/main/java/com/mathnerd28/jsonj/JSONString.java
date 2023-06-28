@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public final class JSONString implements JSONBase, Supplier<String> {
+
   private static final long serialVersionUID = 7777030346963177423L;
 
   private final String str;
@@ -18,8 +19,10 @@ public final class JSONString implements JSONBase, Supplier<String> {
 
   @Override
   public boolean equals(Object o) {
-    return (o == this)
-        || (o != null && o.getClass() == this.getClass() && this.str.equals(((JSONString) o).str));
+    return (
+      (o == this) ||
+      (o != null && o.getClass() == this.getClass() && this.str.equals(((JSONString) o).str))
+    );
   }
 
   @Override
@@ -49,8 +52,7 @@ public final class JSONString implements JSONBase, Supplier<String> {
         } else if (c == '\t') {
           builder.append("\\t");
         } else {
-          builder.append(c < 0x0010 ? "000" : "00")
-                 .append(Integer.toString(c, 16));
+          builder.append(c < 0x0010 ? "000" : "00").append(Integer.toString(c, 16));
         }
       } else if (c == '"') {
         builder.append("\\\"");
@@ -60,7 +62,6 @@ public final class JSONString implements JSONBase, Supplier<String> {
         builder.append(c);
       }
     }
-    return builder.append('"')
-                  .toString();
+    return builder.append('"').toString();
   }
 }

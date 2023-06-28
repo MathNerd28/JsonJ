@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public final class JSONObject extends LinkedHashMap<String, JSONBase> implements JSONBase {
+
   private static final long serialVersionUID = -7400546217746697748L;
 
   public JSONObject() {
@@ -94,8 +95,7 @@ public final class JSONObject extends LinkedHashMap<String, JSONBase> implements
       Entry<String, JSONBase> entry = iterator.next();
       String key = entry.getKey();
       JSONBase value = entry.getValue();
-      builder.append(new JSONString(key).toJSON())
-             .append(':');
+      builder.append(new JSONString(key).toJSON()).append(':');
       if (!compact) {
         builder.append(' ');
       }
@@ -105,8 +105,7 @@ public final class JSONObject extends LinkedHashMap<String, JSONBase> implements
         builder.append(compact ? value.toJSONCompact() : value.toJSON());
       }
       if (!iterator.hasNext()) {
-        return builder.append('}')
-                      .toString();
+        return builder.append('}').toString();
       }
       builder.append(',');
       if (!compact) {
@@ -131,9 +130,7 @@ public final class JSONObject extends LinkedHashMap<String, JSONBase> implements
       Entry<String, JSONBase> entry = iterator.next();
       String key = entry.getKey();
       JSONBase value = entry.getValue();
-      builder.append(indentation)
-             .append(new JSONString(key).toJSON())
-             .append(": ");
+      builder.append(indentation).append(new JSONString(key).toJSON()).append(": ");
       if (value == this) {
         builder.append("(this object)");
       } else if (value instanceof JSONObject) {
@@ -148,8 +145,7 @@ public final class JSONObject extends LinkedHashMap<String, JSONBase> implements
         if (indentation.length() > 2) {
           builder.append(indentation.substring(0, indentation.length() - 2));
         }
-        return builder.append('}')
-                      .toString();
+        return builder.append('}').toString();
       }
       builder.append(",\n");
     }

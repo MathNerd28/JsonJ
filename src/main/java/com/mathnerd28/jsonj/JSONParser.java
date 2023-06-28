@@ -14,9 +14,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class JSONParser {
+
   private static final Pattern INTEGER = Pattern.compile("-?(?:0|[1-9]\\d*)");
-  private static final Pattern FLOAT   = Pattern.compile(
-      "-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[Ee][+-]?(?:0|[1-9]\\d*))?");
+  private static final Pattern FLOAT = Pattern.compile(
+    "-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[Ee][+-]?(?:0|[1-9]\\d*))?"
+  );
 
   private boolean overwriteDuplicateKeys = false;
 
@@ -98,8 +100,9 @@ public class JSONParser {
           tokens.add(Token.RIGHT_BRACKET);
           continue;
         case 't':
-          if ((c = reader.read()) == 'r' && (c = reader.read()) == 'u'
-              && (c = reader.read()) == 'e') {
+          if (
+            (c = reader.read()) == 'r' && (c = reader.read()) == 'u' && (c = reader.read()) == 'e'
+          ) {
             tokens.add(Token.TRUE);
           } else if (c == -1) {
             throwEOF();
@@ -108,8 +111,12 @@ public class JSONParser {
           }
           continue;
         case 'f':
-          if ((c = reader.read()) == 'a' && (c = reader.read()) == 'l' && (c = reader.read()) == 's'
-              && (c = reader.read()) == 'e') {
+          if (
+            (c = reader.read()) == 'a' &&
+            (c = reader.read()) == 'l' &&
+            (c = reader.read()) == 's' &&
+            (c = reader.read()) == 'e'
+          ) {
             tokens.add(Token.FALSE);
           } else if (c == -1) {
             throwEOF();
@@ -118,8 +125,9 @@ public class JSONParser {
           }
           continue;
         case 'n':
-          if ((c = reader.read()) == 'u' && (c = reader.read()) == 'l'
-              && (c = reader.read()) == 'l') {
+          if (
+            (c = reader.read()) == 'u' && (c = reader.read()) == 'l' && (c = reader.read()) == 'l'
+          ) {
             tokens.add(Token.NULL);
           } else if (c == -1) {
             throwEOF();
@@ -128,7 +136,7 @@ public class JSONParser {
           }
           continue;
         default:
-          // no fastpath
+        // no fastpath
       }
 
       // Clear buffer for operation
@@ -137,7 +145,7 @@ public class JSONParser {
       if (c == '"') {
         // String
         boolean escaped = false;
-        loop: while ((c = reader.read()) != '"' || escaped) {
+        loop:while ((c = reader.read()) != '"' || escaped) {
           if (c == -1) {
             throwEOF();
           } else if (c < 0x0020) {
@@ -218,7 +226,7 @@ public class JSONParser {
                 }
                 c = (char) unicode;
               }
-              // fallthrough
+            // fallthrough
             default:
               builder.append((char) c);
               break;
@@ -229,15 +237,19 @@ public class JSONParser {
         // Number: grab all characters, then verify
         do {
           builder.append((char) c);
-        } while (((c = reader.read()) >= '0' && c <= '9') || c == '.' || c == 'e' || c == 'E'
-            || c == '+' || c == '-');
+        } while (
+          ((c = reader.read()) >= '0' && c <= '9') ||
+          c == '.' ||
+          c == 'e' ||
+          c == 'E' ||
+          c == '+' ||
+          c == '-'
+        );
 
         String str = builder.toString();
-        if (INTEGER.matcher(str)
-                   .matches()) {
+        if (INTEGER.matcher(str).matches()) {
           tokens.add(new Token(Token.Type.INTEGER, str));
-        } else if (FLOAT.matcher(str)
-                        .matches()) {
+        } else if (FLOAT.matcher(str).matches()) {
           tokens.add(new Token(Token.Type.FLOAT, str));
         } else {
           throwIllegal();
@@ -257,8 +269,12 @@ public class JSONParser {
       Token t = tokens.next();
       if (t.type == Token.Type.RIGHT_BRACE) {
         return obj;
-      } else if (t.type != Token.Type.STRING || !tokens.hasNext()
-          || tokens.next().type != Token.Type.COLON || !tokens.hasNext()) {
+      } else if (
+        t.type != Token.Type.STRING ||
+        !tokens.hasNext() ||
+        tokens.next().type != Token.Type.COLON ||
+        !tokens.hasNext()
+      ) {
         throwIllegal();
       }
       String key = t.str;
@@ -383,13 +399,6 @@ public class JSONParser {
   }
 
   private static class Token {
-    final Type   type;
-    final String str;
-
-    Token(Type type, String str) {
-      this.type = type;
-      this.str = str;
-    }
 
     enum Type {
       STRING,
@@ -406,15 +415,23 @@ public class JSONParser {
       RIGHT_BRACKET,
     }
 
-    static final Token TRUE          = new Token(Type.TRUE, null);
-    static final Token FALSE         = new Token(Type.FALSE, null);
-    static final Token NULL          = new Token(Type.NULL, null);
-    static final Token COMMA         = new Token(Type.COMMA, null);
-    static final Token COLON         = new Token(Type.COLON, null);
-    static final Token LEFT_BRACE    = new Token(Type.LEFT_BRACE, null);
-    static final Token LEFT_BRACKET  = new Token(Type.LEFT_BRACKET, null);
-    static final Token RIGHT_BRACE   = new Token(Type.RIGHT_BRACE, null);
+    static final Token TRUE = new Token(Type.TRUE, null);
+    static final Token FALSE = new Token(Type.FALSE, null);
+    static final Token NULL = new Token(Type.NULL, null);
+    static final Token COMMA = new Token(Type.COMMA, null);
+    static final Token COLON = new Token(Type.COLON, null);
+    static final Token LEFT_BRACE = new Token(Type.LEFT_BRACE, null);
+    static final Token LEFT_BRACKET = new Token(Type.LEFT_BRACKET, null);
+    static final Token RIGHT_BRACE = new Token(Type.RIGHT_BRACE, null);
     static final Token RIGHT_BRACKET = new Token(Type.RIGHT_BRACKET, null);
+
+    final Type type;
+    final String str;
+
+    Token(Type type, String str) {
+      this.type = type;
+      this.str = str;
+    }
 
     @Override
     public String toString() {

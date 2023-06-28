@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
+
   private static final long serialVersionUID = 1637774693420351464L;
 
   public JSONArray() {
@@ -109,8 +110,7 @@ public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
       JSONBase item = iterator.next();
       builder.append(item == this ? "(this array)" : item);
       if (!iterator.hasNext()) {
-        return builder.append(']')
-                      .toString();
+        return builder.append(']').toString();
       }
       builder.append(',');
       if (!compact) {
@@ -148,8 +148,7 @@ public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
         if (indentation.length() > 2) {
           builder.append(indentation.substring(0, indentation.length() - 2));
         }
-        return builder.append(']')
-                      .toString();
+        return builder.append(']').toString();
       }
       builder.append(",\n");
     }

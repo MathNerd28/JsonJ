@@ -4,6 +4,7 @@ import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 
 public final class JSONInteger implements JSONBase, LongSupplier, IntSupplier {
+
   private static final long serialVersionUID = 3836778627312723823L;
 
   private final long value;
@@ -34,8 +35,10 @@ public final class JSONInteger implements JSONBase, LongSupplier, IntSupplier {
 
   @Override
   public boolean equals(Object o) {
-    return (this == o)
-        || (o != null && o.getClass() == this.getClass() && ((JSONInteger) o).value == this.value);
+    return (
+      (this == o) ||
+      (o != null && o.getClass() == this.getClass() && ((JSONInteger) o).value == this.value)
+    );
   }
 
   @Override
