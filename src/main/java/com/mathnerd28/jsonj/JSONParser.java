@@ -8,17 +8,15 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class JSONParser {
-  private static final Pattern INTEGER     = Pattern.compile("0|-?[1-9]\\d*");
-  private static final Pattern FLOAT_NOEXP = Pattern.compile("(?:0|[1-9]\\d*)\\.\\d+");
-  private static final Pattern FLOAT_EXP   = Pattern.compile(
-      "(?:0|[1-9]\\d*)(?:\\.\\d+)?[Ee][+-]?[1-9]\\d*");
+  private static final Pattern INTEGER = Pattern.compile("-?(?:0|[1-9]\\d*)");
+  private static final Pattern FLOAT   = Pattern.compile(
+      "-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[Ee][+-]?(?:0|[1-9]\\d*))?");
 
   private boolean overwriteDuplicateKeys = false;
 
@@ -238,9 +236,7 @@ public class JSONParser {
         if (INTEGER.matcher(str)
                    .matches()) {
           tokens.add(new Token(Token.Type.INTEGER, str));
-        } else if (FLOAT_NOEXP.matcher(str)
-                              .matches()
-            || FLOAT_EXP.matcher(str)
+        } else if (FLOAT.matcher(str)
                         .matches()) {
           tokens.add(new Token(Token.Type.FLOAT, str));
         } else {
@@ -431,11 +427,5 @@ public class JSONParser {
           return type.toString();
       }
     }
-  }
-
-  public static void main(String... args) throws IOException, JSONParseException {
-    String str = Files.readString(
-        new File("/Users/xbhalla/Library/Application Support/Code/User/settings.json").toPath());
-    System.out.println(((JSONObject) new JSONParser().parse(str)).toJSONFormatted());
   }
 }
