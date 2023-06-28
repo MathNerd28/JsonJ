@@ -157,6 +157,6 @@ public final class JSONObject extends LinkedHashMap<String, JSONBase> implements
 
   @Override
   public boolean equals(Object o) {
-    return (this == o) || (o instanceof JSONObject && super.equals(o));
+    return (this == o) || (o != null && o.getClass() == this.getClass() && super.equals(o));
   }
 }

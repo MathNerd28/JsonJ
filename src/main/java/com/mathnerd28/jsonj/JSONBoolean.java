@@ -4,7 +4,7 @@ import java.util.function.BooleanSupplier;
 
 public final class JSONBoolean implements JSONBase, BooleanSupplier {
   private static final long serialVersionUID = -8286974874362307637L;
-  
+
   public static final JSONBoolean TRUE  = new JSONBoolean(true);
   public static final JSONBoolean FALSE = new JSONBoolean(false);
 
@@ -30,8 +30,8 @@ public final class JSONBoolean implements JSONBase, BooleanSupplier {
 
   @Override
   public boolean equals(Object o) {
-    // Only two instances allowed
-    return o == this;
+    return (o == this)
+        || (o != null && o.getClass() == this.getClass() && ((JSONBoolean) o).value == this.value);
   }
 
   @Override

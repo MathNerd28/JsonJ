@@ -15,6 +15,11 @@ public interface JSONBase extends Serializable {
     public String toJSON() {
       return "null";
     }
+
+    @Override
+    public boolean equals(Object o) {
+      return (o == this) || (o != null && o.getClass() == this.getClass());
+    }
   };
 
   String toJSON();

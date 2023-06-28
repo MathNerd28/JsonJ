@@ -4,7 +4,7 @@ import java.util.function.DoubleSupplier;
 
 public final class JSONFloat implements JSONBase, DoubleSupplier {
   private static final long serialVersionUID = -1001481974395547082L;
-  
+
   private final double value;
 
   public JSONFloat(double value) {
@@ -28,7 +28,8 @@ public final class JSONFloat implements JSONBase, DoubleSupplier {
 
   @Override
   public boolean equals(Object o) {
-    return (o == this) || (o instanceof JSONFloat && ((JSONFloat) o).value == this.value);
+    return (o == this)
+        || (o != null && o.getClass() == this.getClass() && ((JSONFloat) o).value == this.value);
   }
 
   @Override

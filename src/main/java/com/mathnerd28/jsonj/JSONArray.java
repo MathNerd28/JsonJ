@@ -157,6 +157,6 @@ public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
 
   @Override
   public boolean equals(Object o) {
-    return (this == o) || (o instanceof JSONArray && super.equals(o));
+    return (this == o) || (o != null && o.getClass() == this.getClass() && super.equals(o));
   }
 }
