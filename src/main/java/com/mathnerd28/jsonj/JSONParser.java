@@ -259,23 +259,22 @@ public class JSONParser {
     JSONObject obj = new JSONObject();
     while (tokens.hasNext()) {
       Token t = tokens.next();
-      if (t.type() == Token.Type.RIGHT_BRACE) {
+      if (t.type == Token.Type.RIGHT_BRACE) {
         return obj;
-      } else if (t.type() != Token.Type.STRING || !tokens.hasNext() || tokens.next()
-                                                                             .type() != Token.Type.COLON
-          || !tokens.hasNext()) {
+      } else if (t.type != Token.Type.STRING || !tokens.hasNext()
+          || tokens.next().type != Token.Type.COLON || !tokens.hasNext()) {
         throwIllegal();
       }
-      String key = t.str();
+      String key = t.str;
 
       t = tokens.next();
       switch (t.type) {
         case STRING:
-          obj.put(key, new JSONString(t.str()));
+          obj.put(key, new JSONString(t.str));
           break;
         case INTEGER:
           try {
-            long value = Long.parseLong(t.str());
+            long value = Long.parseLong(t.str);
             throwIfExists(obj, key, new JSONInteger(value));
             break;
           } catch (NumberFormatException e) {
@@ -283,7 +282,7 @@ public class JSONParser {
           }
         case FLOAT:
           try {
-            double value = Double.parseDouble(t.str());
+            double value = Double.parseDouble(t.str);
             throwIfExists(obj, key, new JSONFloat(value));
           } catch (NumberFormatException e) {
             throwIllegal();
@@ -308,9 +307,9 @@ public class JSONParser {
           throwIllegal();
       }
       t = tokens.next();
-      if (t.type() == Token.Type.RIGHT_BRACE) {
+      if (t.type == Token.Type.RIGHT_BRACE) {
         return obj;
-      } else if (t.type() != Token.Type.COMMA) {
+      } else if (t.type != Token.Type.COMMA) {
         throwIllegal();
       }
     }
@@ -332,11 +331,11 @@ public class JSONParser {
         case RIGHT_BRACKET:
           return array;
         case STRING:
-          array.add(new JSONString(t.str()));
+          array.add(new JSONString(t.str));
           break;
         case INTEGER:
           try {
-            long value = Long.parseLong(t.str());
+            long value = Long.parseLong(t.str);
             array.add(new JSONInteger(value));
             break;
           } catch (NumberFormatException e) {
@@ -344,7 +343,7 @@ public class JSONParser {
           }
         case FLOAT:
           try {
-            double value = Double.parseDouble(t.str());
+            double value = Double.parseDouble(t.str);
             array.add(new JSONFloat(value));
           } catch (NumberFormatException e) {
             throwIllegal();
@@ -369,9 +368,9 @@ public class JSONParser {
           throwIllegal();
       }
       t = tokens.next();
-      if (t.type() == Token.Type.RIGHT_BRACKET) {
+      if (t.type == Token.Type.RIGHT_BRACKET) {
         return array;
-      } else if (t.type() != Token.Type.COMMA) {
+      } else if (t.type != Token.Type.COMMA) {
         throwIllegal();
       }
     }
@@ -387,7 +386,15 @@ public class JSONParser {
     throw new JSONParseException("Illegal character");
   }
 
-  private static record Token(Token.Type type, String str) {
+  private static class Token {
+    final Type   type;
+    final String str;
+
+    Token(Type type, String str) {
+      this.type = type;
+      this.str = str;
+    }
+
     enum Type {
       STRING,
       INTEGER,
@@ -403,14 +410,14 @@ public class JSONParser {
       RIGHT_BRACKET,
     }
 
-    static final Token TRUE = new Token(Type.TRUE, null);
-    static final Token FALSE = new Token(Type.FALSE, null);
-    static final Token NULL = new Token(Type.NULL, null);
-    static final Token COMMA = new Token(Type.COMMA, null);
-    static final Token COLON = new Token(Type.COLON, null);
-    static final Token LEFT_BRACE = new Token(Type.LEFT_BRACE, null);
-    static final Token LEFT_BRACKET = new Token(Type.LEFT_BRACKET, null);
-    static final Token RIGHT_BRACE = new Token(Type.RIGHT_BRACE, null);
+    static final Token TRUE          = new Token(Type.TRUE, null);
+    static final Token FALSE         = new Token(Type.FALSE, null);
+    static final Token NULL          = new Token(Type.NULL, null);
+    static final Token COMMA         = new Token(Type.COMMA, null);
+    static final Token COLON         = new Token(Type.COLON, null);
+    static final Token LEFT_BRACE    = new Token(Type.LEFT_BRACE, null);
+    static final Token LEFT_BRACKET  = new Token(Type.LEFT_BRACKET, null);
+    static final Token RIGHT_BRACE   = new Token(Type.RIGHT_BRACE, null);
     static final Token RIGHT_BRACKET = new Token(Type.RIGHT_BRACKET, null);
 
     @Override
