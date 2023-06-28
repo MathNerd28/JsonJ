@@ -1,16 +1,27 @@
 package com.mathnerd28.jsonj;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
-public class JSONString implements JSONBase, Supplier<String> {
+public final class JSONString implements JSONBase, Supplier<String> {
   private final String str;
 
   public JSONString(String str) {
-    this.str = str;
+    this.str = Objects.requireNonNull(str);
   }
 
   public String get() {
     return str;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return (o == this) || (o instanceof JSONString && this.str.equals(((JSONString) o).str));
+  }
+
+  @Override
+  public int hashCode() {
+    return str.hashCode();
   }
 
   @Override

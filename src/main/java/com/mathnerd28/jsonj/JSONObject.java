@@ -2,9 +2,22 @@ package com.mathnerd28.jsonj;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
-public class JSONObject extends LinkedHashMap<String, JSONBase> implements JSONBase {
+public final class JSONObject extends LinkedHashMap<String, JSONBase> implements JSONBase {
+  public JSONObject() {
+    super();
+  }
+
+  public JSONObject(int capacity) {
+    super(capacity);
+  }
+
+  public JSONObject(Map<String, JSONBase> map) {
+    super(map);
+  }
+
   public JSONObject getObject(String key) {
     return (JSONObject) get(key);
   }
@@ -139,5 +152,10 @@ public class JSONObject extends LinkedHashMap<String, JSONBase> implements JSONB
       }
       builder.append(",\n");
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return (this == o) || (o instanceof JSONObject && super.equals(o));
   }
 }

@@ -2,7 +2,7 @@ package com.mathnerd28.jsonj;
 
 import java.util.function.BooleanSupplier;
 
-public class JSONBoolean implements JSONBase, BooleanSupplier {
+public final class JSONBoolean implements JSONBase, BooleanSupplier {
   public static final JSONBoolean TRUE  = new JSONBoolean(true);
   public static final JSONBoolean FALSE = new JSONBoolean(false);
 
@@ -24,6 +24,17 @@ public class JSONBoolean implements JSONBase, BooleanSupplier {
   @Override
   public String toString() {
     return Boolean.toString(value);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    // Only two instances allowed
+    return o == this;
+  }
+
+  @Override
+  public int hashCode() {
+    return Boolean.hashCode(value);
   }
 
   public static JSONBoolean valueOf(boolean b) {

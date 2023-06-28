@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class JSONArray extends ArrayList<JSONBase> implements JSONBase {
+public final class JSONArray extends ArrayList<JSONBase> implements JSONBase {
   public JSONArray() {
     super();
   }
@@ -152,5 +152,10 @@ public class JSONArray extends ArrayList<JSONBase> implements JSONBase {
       }
       builder.append(",\n");
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return (this == o) || (o instanceof JSONArray && super.equals(o));
   }
 }
