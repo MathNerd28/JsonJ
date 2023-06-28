@@ -1,4 +1,4 @@
-package com.mathnerd28.json;
+package com.mathnerd28.jsonj;
 
 public class JSONParseException extends Exception {
   public JSONParseException() {

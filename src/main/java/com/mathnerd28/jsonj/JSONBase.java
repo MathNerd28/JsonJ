@@ -1,4 +1,4 @@
-package com.mathnerd28.json;
+package com.mathnerd28.jsonj;
 
 public interface JSONBase {
   JSONBase NULL = new JSONBase() {

@@ -1,4 +1,4 @@
-package com.mathnerd28.json;
+package com.mathnerd28.jsonj;
 
 import java.io.File;
 import java.io.FileReader;

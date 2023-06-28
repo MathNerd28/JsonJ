@@ -1,4 +1,4 @@
-package com.mathnerd28.json;
+package com.mathnerd28.jsonj;
 
 import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
