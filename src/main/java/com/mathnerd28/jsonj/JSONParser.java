@@ -1,7 +1,8 @@
 package com.mathnerd28.jsonj;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,7 +35,8 @@ public class JSONParser {
 
   public JSONElement parse(String json) throws JSONParseException {
     try {
-      return parse(new StringReader(json));
+      // don't need to buffer
+      return parse0(new StringReader(json));
     } catch (IOException e) {
       // can't occur
       throw new IllegalStateException(e);
@@ -42,7 +44,7 @@ public class JSONParser {
   }
 
   public JSONElement parse(File file) throws IOException, JSONParseException {
-    return parse(new FileReader(file));
+    return parse(new FileInputStream(file));
   }
 
   public JSONElement parse(InputStream stream) throws IOException, JSONParseException {
@@ -50,6 +52,10 @@ public class JSONParser {
   }
 
   public JSONElement parse(Reader reader) throws IOException, JSONParseException {
+    return parse0(reader instanceof BufferedReader ? reader : new BufferedReader(reader, 4096));
+  }
+
+  private JSONElement parse0(Reader reader) throws IOException, JSONParseException {
     if (reader == null) {
       throw new IllegalArgumentException("reader cannot be null");
     }
@@ -155,6 +161,7 @@ public class JSONParser {
         // String
         boolean escaped = false;
         loop:for (;;) {
+          c = reader.read();
           if (c == -1) {
             throwEOF();
           } else if (c < 0x0020) {
@@ -340,7 +347,8 @@ public class JSONParser {
     return null;
   }
 
-  private void throwIfExists(JSONObject obj, String key, JSONElement value) throws JSONParseException {
+  private void throwIfExists(JSONObject obj, String key, JSONElement value)
+    throws JSONParseException {
     if (obj.put(key, value) != null && !overwriteDuplicateKeys) {
       throw new JSONParseException("Duplicate key '" + key + "'");
     }
