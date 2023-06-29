@@ -9,6 +9,9 @@ public final class JSONFloat implements JSONElement, DoubleSupplier {
   private final double value;
 
   public JSONFloat(double value) {
+    if (!Double.isFinite(value)) {
+      throw new IllegalArgumentException("JSON prohibits infinite numbers");
+    }
     this.value = value;
   }
 
