@@ -8,7 +8,7 @@ public interface JSONElement extends Serializable {
 
     @Override
     public String toString() {
-      return "NULL";
+      return "null";
     }
 
     @Override
