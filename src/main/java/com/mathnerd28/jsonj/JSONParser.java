@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -143,8 +142,16 @@ public class JSONParser {
     List<Token> tokens = new ArrayList<>();
     StringBuilder builder = new StringBuilder();
     boolean noRead = true;
-    while (noRead || (c = read()) != -1) {
-      noRead = false;
+    for (;;) {
+      if (noRead) {
+        noRead = false;
+      } else {
+        c = read();
+      }
+      if (c == -1) {
+        reader.close();
+        return tokens;
+      }
 
       // These don't require the buffer, fastpath
       switch (c) {
@@ -346,8 +353,6 @@ public class JSONParser {
         throw new JSONParseException("Unknown pattern", line, col);
       }
     }
-    reader.close();
-    return tokens;
   }
 
   private JSONObject processObj() throws JSONParseException {
@@ -363,11 +368,8 @@ public class JSONParser {
       }
 
       Token t2 = tokens.next();
-      if (t2.type != TokenType.COLON) {
-        throw new JSONParseException("Expected colon instead of " + t2.type, t2.line, t2.col);
-      } else if (!tokens.hasNext()) {
-        throw new JSONParseException("Unexpected termination", t2.line, t2.col);
-      }
+      expect(t2, TokenType.COLON);
+      checkTermination();
 
       t2 = tokens.next();
       switch (t2.type) {
@@ -391,7 +393,7 @@ public class JSONParser {
               duplicateKey(t);
             }
           } catch (NumberFormatException e) {
-            throw new JSONParseException("Invalid number " + t2.str, t2.line, t2.col);
+            badNumber(t2);
           }
           break;
         case TRUE:
@@ -423,6 +425,7 @@ public class JSONParser {
           badToken(t2);
       }
 
+      checkTermination();
       t = tokens.next();
       if (t.type == TokenType.RIGHT_BRACE) {
         return obj;
@@ -456,7 +459,7 @@ public class JSONParser {
             double value = Double.parseDouble(t.str);
             array.add(new JSONFloat(value));
           } catch (NumberFormatException e) {
-            throw new JSONParseException("Invalid number " + t.str, t.line, t.col);
+            badNumber(t);
           }
           break;
         case TRUE:
@@ -477,6 +480,8 @@ public class JSONParser {
         default:
           badToken(t);
       }
+
+      checkTermination();
       t = tokens.next();
       if (t.type == TokenType.RIGHT_BRACKET) {
         return array;
@@ -491,7 +496,11 @@ public class JSONParser {
   }
 
   private void badToken(Token t) throws JSONParseException {
-    throw new JSONParseException("Unexpected token " + t.type, t.line, t.col);
+    throw new JSONParseException("Unexpected " + t.type + " token '" + t.str + "'", t.line, t.col);
+  }
+
+  private void badNumber(Token t) throws JSONParseException {
+    throw new JSONParseException("Invalid " + t.type + " '" + t.str + "'", t.line, t.col);
   }
 
   private void expect(Token t, TokenType type) throws JSONParseException {
