@@ -146,6 +146,10 @@ public class JSONParser {
     }
   }
 
+  private boolean hasChar() throws IOException {
+    return carryC >= 0 || (carryC = reader.read()) != -1;
+  }
+
   private char nextChar() throws IOException, JSONParseException {
     if (carryC != -2) {
       int c = carryC;
@@ -320,6 +324,9 @@ public class JSONParser {
       // Number: grab all characters, then verify
       do {
         builder.append(c);
+        if (!hasChar()) {
+          break;
+        }
         c = nextChar();
       } while (
         // prettier-ignore
