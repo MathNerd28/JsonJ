@@ -86,27 +86,31 @@ public class JSONParser {
   }
 
   public JSONElement parse(String json) throws JSONParseException {
-    try {
+    try (Reader reader = new StringReader(json)) {
       // don't need to buffer
-      return parse0(new StringReader(json));
+      return parseRaw(reader);
     } catch (IOException e) {
       throw new AssertionError("IOException from StringReader", e);
     }
   }
 
   public JSONElement parse(File file) throws IOException, JSONParseException {
-    return parse(new FileInputStream(file));
+    try (InputStream stream = new FileInputStream(file)) {
+      return parse(stream);
+    }
   }
 
   public JSONElement parse(InputStream stream) throws IOException, JSONParseException {
+    // Don't want to close
     return parse(new InputStreamReader(stream, StandardCharsets.UTF_8));
   }
 
   public JSONElement parse(Reader reader) throws IOException, JSONParseException {
-    return parse0(reader instanceof BufferedReader ? reader : new BufferedReader(reader, 4096));
+    // Don't want to close
+    return parseRaw(reader instanceof BufferedReader ? reader : new BufferedReader(reader, 4096));
   }
 
-  private JSONElement parse0(Reader r) throws IOException, JSONParseException {
+  private JSONElement parseRaw(Reader r) throws IOException, JSONParseException {
     reader = r;
     line = 1;
     col = 0;
@@ -137,12 +141,18 @@ public class JSONParser {
           double value = Double.parseDouble(t.str);
           return new JSONFloat(value);
         } catch (NumberFormatException e) {
-          badNumber(t);
-          return null;
+          throw new JSONParseException(
+            "Invalid " + t.type + " '" + t.str + "'",
+            tokenLine,
+            tokenCol
+          );
         }
       default:
-        badToken(t);
-        return null;
+        throw new JSONParseException(
+          "Unexpected " + t.type + " token '" + t.str + "'",
+          tokenLine,
+          tokenCol
+        );
     }
   }
 
@@ -354,13 +364,18 @@ public class JSONParser {
 
   private JSONObject processObj() throws IOException, JSONParseException {
     JSONObject obj = new JSONObject();
+    Token t = nextToken();
+    if (t.type == TokenType.RIGHT_BRACE) {
+      return obj;
+    }
     for (;;) {
-      Token t = nextToken();
-      if (t.type != TokenType.STRING) {
-        expect(t, TokenType.RIGHT_BRACE);
-        return obj;
-      } else if (!allowDuplicateKeys && obj.containsKey(t.str)) {
-        throw new JSONParseException("Duplicate key '" + t.str + "'", tokenLine, tokenCol);
+      expect(t, TokenType.STRING);
+      if (obj.containsKey(t.str)) {
+        if (allowDuplicateKeys) {
+          obj.remove(t.str);
+        } else {
+          throw new JSONParseException("Duplicate key '" + t.str + "'", tokenLine, tokenCol);
+        }
       }
       expect(nextToken(), TokenType.COLON);
 
@@ -382,7 +397,11 @@ public class JSONParser {
             double value = Double.parseDouble(t2.str);
             obj.put(t.str, new JSONFloat(value));
           } catch (NumberFormatException e) {
-            badNumber(t2);
+            throw new JSONParseException(
+              "Invalid " + t2.type + " '" + t2.str + "'",
+              tokenLine,
+              tokenCol
+            );
           }
           break;
         case TRUE:
@@ -401,25 +420,30 @@ public class JSONParser {
           obj.put(t.str, processObj());
           break;
         default:
-          badToken(t2);
+          throw new JSONParseException(
+            "Unexpected " + t2.type + " token '" + t2.str + "'",
+            tokenLine,
+            tokenCol
+          );
       }
 
       t = nextToken();
-      if (t.type == TokenType.COMMA) {
-        continue;
+      if (t.type != TokenType.COMMA) {
+        expect(t, TokenType.RIGHT_BRACE);
+        return obj;
       }
-      expect(t, TokenType.RIGHT_BRACE);
-      return obj;
+      t = nextToken();
     }
   }
 
   private JSONArray processArr() throws IOException, JSONParseException {
     JSONArray array = new JSONArray();
+    Token t = nextToken();
+    if (t.type == TokenType.RIGHT_BRACKET) {
+      return array;
+    }
     for (;;) {
-      Token t = nextToken();
       switch (t.type) {
-        case RIGHT_BRACKET:
-          return array;
         case STRING:
           array.add(new JSONString(t.str));
           break;
@@ -436,7 +460,11 @@ public class JSONParser {
             double value = Double.parseDouble(t.str);
             array.add(new JSONFloat(value));
           } catch (NumberFormatException e) {
-            badNumber(t);
+            throw new JSONParseException(
+              "Invalid " + t.type + " '" + t.str + "'",
+              tokenLine,
+              tokenCol
+            );
           }
           break;
         case TRUE:
@@ -455,28 +483,20 @@ public class JSONParser {
           array.add(processObj());
           break;
         default:
-          badToken(t);
+          throw new JSONParseException(
+            "Unexpected " + t.type + " token '" + t.str + "'",
+            tokenLine,
+            tokenCol
+          );
       }
 
       t = nextToken();
-      if (t.type == TokenType.COMMA) {
-        continue;
+      if (t.type != TokenType.COMMA) {
+        expect(t, TokenType.RIGHT_BRACKET);
+        return array;
       }
-      expect(t, TokenType.RIGHT_BRACKET);
-      return array;
+      t = nextToken();
     }
-  }
-
-  private void badToken(Token t) throws JSONParseException {
-    throw new JSONParseException(
-      "Unexpected " + t.type + " token '" + t.str + "'",
-      tokenLine,
-      tokenCol
-    );
-  }
-
-  private void badNumber(Token t) throws JSONParseException {
-    throw new JSONParseException("Invalid " + t.type + " '" + t.str + "'", tokenLine, tokenCol);
   }
 
   private void expect(Token t, TokenType type) throws JSONParseException {
