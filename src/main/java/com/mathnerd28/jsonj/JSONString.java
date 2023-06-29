@@ -52,7 +52,7 @@ public final class JSONString implements JSONElement, Supplier<String> {
         } else if (c == '\t') {
           builder.append("\\t");
         } else {
-          builder.append(c < 0x0010 ? "000" : "00").append(Integer.toString(c, 16));
+          builder.append(c < 0x0010 ? "\\u000" : "\\u00").append(Integer.toString(c, 16));
         }
       } else if (c == '"') {
         builder.append("\\\"");

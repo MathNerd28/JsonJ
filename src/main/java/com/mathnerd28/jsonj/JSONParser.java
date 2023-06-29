@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.regex.Pattern;
 
 public class JSONParser {
@@ -60,22 +59,29 @@ public class JSONParser {
   );
 
   private Reader reader;
-  private StringBuilder builder = new StringBuilder();
-  private int carryC = -2;
+  private StringBuilder builder;
+
+  private int carryC;
   private int line;
   private int col;
   private int tokenLine;
   private int tokenCol;
 
-  private boolean overwriteDuplicateKeys = false;
+  private boolean allowDuplicateKeys;
+
+  public JSONParser() {
+    builder = new StringBuilder();
+    carryC = -2;
+    allowDuplicateKeys = false;
+  }
 
   public JSONParser overwritingDuplicateKeys() {
-    overwriteDuplicateKeys = true;
+    allowDuplicateKeys = true;
     return this;
   }
 
   public JSONParser exceptingDuplicateKeys() {
-    overwriteDuplicateKeys = false;
+    allowDuplicateKeys = false;
     return this;
   }
 
@@ -84,8 +90,7 @@ public class JSONParser {
       // don't need to buffer
       return parse0(new StringReader(json));
     } catch (IOException e) {
-      // can't occur
-      throw new IllegalStateException(e);
+      throw new AssertionError("IOException from StringReader", e);
     }
   }
 
@@ -318,12 +323,12 @@ public class JSONParser {
         c = nextChar();
       } while (
         // prettier-ignore
-          (c >= '0' && c <= '9') ||
-          c == '.' ||
-          c == 'e' ||
-          c == 'E' ||
-          c == '+' ||
-          c == '-'
+        (c >= '0' && c <= '9') ||
+        c == '.' ||
+        c == 'e' ||
+        c == 'E' ||
+        c == '+' ||
+        c == '-'
       );
 
       carryC = c;
@@ -344,26 +349,23 @@ public class JSONParser {
     JSONObject obj = new JSONObject();
     for (;;) {
       Token t = nextToken();
-      if (t.type == TokenType.RIGHT_BRACE) {
+      if (t.type != TokenType.STRING) {
+        expect(t, TokenType.RIGHT_BRACE);
         return obj;
-      } else {
-        expect(t, TokenType.STRING);
+      } else if (!allowDuplicateKeys && obj.containsKey(t.str)) {
+        throw new JSONParseException("Duplicate key '" + t.str + "'", tokenLine, tokenCol);
       }
       expect(nextToken(), TokenType.COLON);
 
       Token t2 = nextToken();
       switch (t2.type) {
         case STRING:
-          if (obj.put(t.str, new JSONString(t2.str)) != null) {
-            duplicateKey(t);
-          }
+          obj.put(t.str, new JSONString(t2.str));
           break;
         case INTEGER:
           try {
             long value = Long.parseLong(t2.str);
-            if (obj.put(t.str, new JSONInteger(value)) != null) {
-              duplicateKey(t);
-            }
+            obj.put(t.str, new JSONInteger(value));
             break;
           } catch (NumberFormatException e) {
             // fallthrough
@@ -371,37 +373,25 @@ public class JSONParser {
         case FLOAT:
           try {
             double value = Double.parseDouble(t2.str);
-            if (obj.put(t.str, new JSONFloat(value)) != null) {
-              duplicateKey(t);
-            }
+            obj.put(t.str, new JSONFloat(value));
           } catch (NumberFormatException e) {
             badNumber(t2);
           }
           break;
         case TRUE:
-          if (obj.put(t.str, JSONBoolean.TRUE) != null) {
-            duplicateKey(t);
-          }
+          obj.put(t.str, JSONBoolean.TRUE);
           break;
         case FALSE:
-          if (obj.put(t.str, JSONBoolean.FALSE) != null) {
-            duplicateKey(t);
-          }
+          obj.put(t.str, JSONBoolean.FALSE);
           break;
         case NULL:
-          if (obj.put(t.str, JSONElement.NULL) != null) {
-            duplicateKey(t);
-          }
+          obj.put(t.str, JSONElement.NULL);
           break;
         case LEFT_BRACKET:
-          if (obj.put(t.str, processArr()) != null) {
-            duplicateKey(t);
-          }
+          obj.put(t.str, processArr());
           break;
         case LEFT_BRACE:
-          if (obj.put(t.str, processObj()) != null) {
-            duplicateKey(t);
-          }
+          obj.put(t.str, processObj());
           break;
         default:
           badToken(t2);
@@ -490,20 +480,5 @@ public class JSONParser {
         tokenCol
       );
     }
-  }
-
-  private void duplicateKey(Token t) throws JSONParseException {
-    if (!overwriteDuplicateKeys) {
-      throw new JSONParseException("Duplicate key '" + t.str + "'", tokenLine, tokenCol);
-    }
-  }
-
-  public static void main(String... args) throws IOException, JSONParseException {
-    String str = new String(
-      Files.readAllBytes(
-        new File("/Users/xbhalla/Library/Application Support/Code/User/settings.json").toPath()
-      )
-    );
-    System.out.println(((JSONObject) new JSONParser().parse(str)).toJSONFormatted());
   }
 }
