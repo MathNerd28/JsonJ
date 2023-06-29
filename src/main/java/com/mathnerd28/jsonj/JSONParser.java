@@ -87,11 +87,19 @@ public class JSONParser {
   }
 
   public JSONElement parse(String json) throws JSONParseException {
-    try (Reader reader = new StringReader(json)) {
+    // BUG: exception in try-with-resources causes self-suppression???
+    Reader reader = new StringReader(json);
+    try {
       // don't need to buffer
       return parseRaw(reader);
     } catch (IOException e) {
       throw new AssertionError("IOException from StringReader", e);
+    } finally {
+      try {
+        reader.close();
+      } catch (IOException e) {
+        throw new AssertionError("IOException from StringReader", e);
+      }
     }
   }
 
